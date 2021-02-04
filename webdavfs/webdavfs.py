@@ -182,7 +182,8 @@ class WebDAVFS(FS):
         info_dict = {
             'basic': {"is_dir": False},
             'details': {'type': int(ResourceType.file)},
-            'access': {}
+            'access': {},
+            'other': {},
         }
 
         if six.PY2:
