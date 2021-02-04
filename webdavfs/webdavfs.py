@@ -19,7 +19,7 @@ from fs.enums import ResourceType, Seek
 from fs.info import Info
 from fs.iotools import line_iterator
 from fs.mode import Mode
-from fs.path import dirname
+from fs.path import dirname, basename
 
 
 log = logging.getLogger(__name__)
@@ -208,11 +208,16 @@ class WebDAVFS(FS):
                 if key in ('modified', 'created', 'accessed'):
                     info_dict['details'][key] = decode(val) or None
                 else:
-                    info_dict['details'][key] = decode(val) 
+                    info_dict['details'][key] = decode(val)
             elif key in access:
                 info_dict['access'][key] = decode(val)
             else:
                 info_dict['other'][key] = decode(val)
+
+        if info_dict['basic']['name'] is None:
+            # Displayname is optional
+            name = basename(info_dict['other']['path'])
+            info_dict['basic']['name'] = name
 
         return info_dict
 
