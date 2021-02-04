@@ -323,6 +323,20 @@ class WebDAVFS(FS):
             raise errors.DirectoryNotEmpty(path)
         self.client.clean(_path.encode('utf-8'))
 
+    def scandir(
+        self,
+        path,  # type: Text
+        namespaces=None,  # type: Optional[Collection[Text]]
+    ):
+        # type: (...) -> Iterator[Info]
+        namespaces = namespaces or ()
+        _path = self.validatepath(path)
+
+        dir_list = self.client.list(_path.encode('utf-8'), get_info=True)
+        for el in dir_list:
+            info_dict = self._create_info_dict(el)
+            yield Info(info_dict)
+
     def setbytes(self, path, contents):
         if not isinstance(contents, bytes):
             raise TypeError('contents must be bytes')
