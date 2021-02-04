@@ -186,6 +186,10 @@ class WebDAVFS(FS):
             'other': {},
         }
 
+        if info.get('isdir', False):
+            info_dict['basic']['is_dir'] = True
+            info_dict['details']['type'] = ResourceType.directory
+
         if six.PY2:
             def decode(s):
                 return s.decode('utf-8') if isinstance(s, bytes) else s
@@ -217,7 +221,7 @@ class WebDAVFS(FS):
 
         if info_dict['basic']['name'] is None:
             # Displayname is optional
-            name = basename(info_dict['other']['path'])
+            name = basename(info_dict['other']['path'].rstrip('/'))
             info_dict['basic']['name'] = name
 
         return info_dict
@@ -252,6 +256,8 @@ class WebDAVFS(FS):
         else:
             try:
                 info = self.client.info(_path.encode('utf-8'))
+                if 'path' not in info:
+                    info['path'] = _path
                 info_dict = self._create_info_dict(info)
                 if self.client.is_dir(_path.encode('utf-8')):
                     info_dict['basic']['is_dir'] = True
